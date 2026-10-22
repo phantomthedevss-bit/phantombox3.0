@@ -7,14 +7,16 @@ import Link from 'next/link';
 
 export async function generateMetadata({params}){
   try{
-    const movie = await tmdb.movieDetails(params.id);
+    const {id} = await params;
+    const movie = await tmdb.movieDetails(id);
     return { title: `${movie.title} — PhantomBox`, description: movie.overview?.slice(0,160) };
   }catch{ return { title: 'Movie — PhantomBox' } }
 }
 
 export default async function MoviePage({params}){
-  const movie = await tmdb.movieDetails(params.id).catch(()=>null);
-  if(!movie) return <div className="min-h-screen grid place-items-center">Not found <Link href="/" className="underline ml-2">Home</Link></div>;
+  const {id} = await params;
+  const movie = await tmdb.movieDetails(id).catch(()=>null);
+  if(!movie) return <div className="min-h-screen grid place-items-center pt-[64px]">Not found <Link href="/" className="underline ml-2">Home</Link></div>;
   const backdrop = movie.backdrop_path ? `${IMG.backdrop}${movie.backdrop_path}` : IMG.backdropPlaceholder;
   const poster = movie.poster_path ? `${IMG.poster}${movie.poster_path}` : IMG.placeholder;
   const trailer = movie.videos?.results?.find(v=>v.site==='YouTube' && (v.type==='Trailer'||v.type==='Teaser'));
@@ -25,7 +27,7 @@ export default async function MoviePage({params}){
       <Navbar />
       <div className="relative h-[60vh] overflow-hidden">
         <img src={backdrop} alt={movie.title} className="absolute inset-0 w-full h-full object-cover" />
-        <div className="hero-vignette" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/40 to-transparent" />
         <div className="absolute bottom-0 p-4 md:p-10 flex gap-6 items-end">
           <img src={poster} alt="" className="w-32 md:w-48 rounded-xl hidden md:block shadow-2xl" />
           <div>
@@ -45,7 +47,7 @@ export default async function MoviePage({params}){
               <div className="relative aspect-video bg-black rounded-2xl overflow-hidden border border-white/10">
                 <iframe src={`https://www.youtube.com/embed/${trailer.key}?rel=0`} title="Trailer" sandbox="allow-scripts allow-same-origin allow-forms" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" className="absolute inset-0 w-full h-full border-0" />
               </div>
-              <p className="text-[11px] text-zinc-500 mt-2">Sandbox: allow-scripts allow-same-origin allow-forms (no popups, no top-navigation). window.open blocked.</p>
+              <p className="text-[11px] text-zinc-500 mt-2">Sandbox: allow-scripts allow-same-origin allow-forms (no popups, no top-navigation).</p>
             </div>
           )}
 
@@ -64,49 +66,28 @@ export default async function MoviePage({params}){
               <h3 className="font-display font-semibold mt-8 mb-3">More Like This</h3>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                 {movie.similar.results.slice(0,10).map(m=>(
-                  <Link key={m.id} href={`/movie/${m.id}`} className="rounded-xl overflow-hidden bg-zinc-900 hover:scale-105 transition">
-                    <img src={m.poster_path ? `${IMG.poster}${m.poster_path}` : ''} alt={m.title} className="aspect-[2/3] object-cover" />
+                  <Link key={m.id} href={`/movie/${m.id}`} className="rounded-xl overflow-hidden bg-zinc-900 block">
+                    <img src={m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : IMG.placeholder} alt={m.title} className="aspect-[2/3] object-cover" />
                   </Link>
                 ))}
               </div>
             </>
           )}
         </div>
-
         <div className="space-y-4">
-          <div className="glass rounded-2xl p-5">
-            <h4 className="font-semibold mb-3">Where to Watch Legally</h4>
+          <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-4">
+            <h4 className="font-semibold mb-2">Where to Watch</h4>
             {providers ? (
-              <div className="space-y-3">
-                {providers.flatrate && <div><p className="text-[11px] text-zinc-500 uppercase">Stream</p><div className="flex flex-wrap gap-2 mt-1">{providers.flatrate.map(p=><span key={p.provider_id} className="flex items-center gap-1 text-xs bg-white/5 border border-white/10 px-2 py-1 rounded-full"><img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="w-4 h-4 rounded" />{p.provider_name}</span>)}</div></div>}
-                {providers.buy && <div><p className="text-[11px] text-zinc-500 uppercase">Buy / Download</p><div className="flex flex-wrap gap-2 mt-1">{providers.buy.map(p=><span key={p.provider_id} className="flex items-center gap-1 text-xs bg-white/5 border border-white/10 px-2 py-1 rounded-full"><img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="w-4 h-4 rounded" />{p.provider_name}</span>)}</div></div>}
-                {providers.rent && <div><p className="text-[11px] text-zinc-500 uppercase">Rent</p><div className="flex flex-wrap gap-2 mt-1">{providers.rent.map(p=><span key={p.provider_id} className="flex items-center gap-1 text-xs bg-white/5 border border-white/10 px-2 py-1 rounded-full"><img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="w-4 h-4 rounded" />{p.provider_name}</span>)}</div></div>}
-                <p className="text-[10px] text-zinc-500 mt-3">Data from JustWatch via TMDB. Links go to official apps where you can download offline legally.</p>
+              <div className="space-y-2 text-sm">
+                {providers.flatrate && <p>Stream: {providers.flatrate.map(p=>p.provider_name).join(', ')}</p>}
+                {providers.rent && <p>Rent: {providers.rent.map(p=>p.provider_name).join(', ')}</p>}
+                {providers.buy && <p>Buy: {providers.buy.map(p=>p.provider_name).join(', ')}</p>}
               </div>
-            ) : <p className="text-[12px] text-zinc-500">No providers found in your region. Search JustWatch for legal options.</p>}
+            ) : <p className="text-sm text-zinc-500">No provider data for this title.</p>}
           </div>
-
-          <div className="glass rounded-2xl p-5">
-            <h4 className="font-semibold mb-3">Legal Download Options</h4>
-            <div className="flex flex-col gap-2">
-              <a href={poster} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-[13px]">🖼️ Download Poster (Legal)</a>
-              <button onClick={()=>{ const blob=new Blob([JSON.stringify(movie,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${movie.title}_info.json`; a.click(); URL.revokeObjectURL(url); }} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-[13px] text-left">📄 Download Info JSON</button>
-            </div>
-            <p className="text-[10px] text-zinc-500 mt-3">No pirated movie files. Only posters, metadata, and links to official stores.</p>
-          </div>
-
-          <div className="glass rounded-2xl p-5">
-            <h4 className="font-semibold mb-2">Details</h4>
-            <ul className="text-[12px] text-zinc-400 space-y-1">
-              <li>Release: {movie.release_date}</li>
-              <li>Rating: {movie.vote_average}/10</li>
-              <li>Runtime: {Math.floor(movie.runtime/60)}h {movie.runtime%60}m</li>
-              <li>Budget: {movie.budget ? `$${(movie.budget/1e6).toFixed(1)}M` : '—'}</li>
-            </ul>
-          </div>
+          <Link href="/" className="block text-center bg-white text-black rounded-xl py-3 font-semibold">← Back Home</Link>
         </div>
       </div>
-
       <Footer />
     </div>
   );
