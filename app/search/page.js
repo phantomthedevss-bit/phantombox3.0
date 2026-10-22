@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { tmdb } from '../../lib/tmdb';
@@ -32,7 +33,7 @@ function SearchInner(){
           {results.map(m=>(
             <Link key={m.id} href={`/movie/${m.id}`} className="rounded-xl overflow-hidden bg-zinc-900 block hover:scale-105 transition">
               <img src={m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : 'https://via.placeholder.com/500x750'} alt={m.title} className="aspect-[2/3] object-cover" />
-              <div className="p-2.5"><p className="text- font-semibold line-clamp-2">{m.title}</p></div>
+              <div className="p-2.5"><p className="text-[12px] font-semibold line-clamp-2">{m.title}</p><p className="text-[11px] text-zinc-400">{m.vote_average?.toFixed(1)}</p></div>
             </Link>
           ))}
         </div>
@@ -43,7 +44,7 @@ function SearchInner(){
 
 export default function SearchPage(){
   return (
-    <div className="min-h-screen pt-">
+    <div className="min-h-screen pt-[64px]">
       <Suspense fallback={<div className="px-10 py-8 text-zinc-500">Loading search...</div>}>
         <SearchInner />
       </Suspense>
