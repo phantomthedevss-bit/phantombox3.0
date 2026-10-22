@@ -1,0 +1,23 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html{scroll-behavior:smooth}
+body{background:#050507;color:#fff;font-family:Inter,system-ui,sans-serif}
+.mesh-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:#050507;pointer-events:none}
+.mesh-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.5;mix-blend-mode:screen;animation:floatMesh 18s ease-in-out infinite}
+.orb-1{width:700px;height:700px;background:radial-gradient(circle at 30% 30%, #7c3aed 0%, #4f46e5 40%, transparent 70%);top:-10%;left:-10%}
+.orb-2{width:600px;height:600px;background:radial-gradient(circle at 50% 50%, #ec4899 0%, #7c3aed 50%, transparent 70%);top:20%;right:-15%}
+.orb-3{width:800px;height:800px;background:radial-gradient(circle at 40% 60%, #06b6d4 0%, #7c3aed 40%, transparent 70%);bottom:-20%;left:10%}
+@keyframes floatMesh{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,30px) scale(1.05)}}
+.glass{backdrop-filter:blur(30px) saturate(210%);-webkit-backdrop-filter:blur(30px) saturate(210%);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)}
+.glass-nav{backdrop-filter:blur(30px) saturate(180%);background:rgba(10,10,15,0.7);border-bottom:1px solid rgba(255,255,255,0.08)}
+.movie-card{transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);will-change:transform}
+.movie-card:hover{transform:scale(1.06) translateY(-4px);box-shadow:0 16px 32px rgba(0,0,0,0.5), 0 0 30px rgba(124,58,237,0.2)}
+.row-scroll{scrollbar-width:thin}
+.row-scroll::-webkit-scrollbar{height:6px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#1e1e2e;border-radius:999px}
+.skeleton{background:#12121a linear-gradient(to right, #12121a 0%, #1e1e2e 20%, #12121a 40%, #12121a 100%);background-size:800px 100%;animation:shimmer 1.4s infinite linear}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.hero-vignette{position:absolute;inset:0;background:radial-gradient(80% 80% at 30% 20%, rgba(124,58,237,0.18) 0%, transparent 60%),linear-gradient(180deg, rgba(5,7,10,0.2) 0%, rgba(5,7,10,0.9) 75%, #050507 100%)}
